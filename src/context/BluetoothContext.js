@@ -1,5 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { NotificationService } from '../services/NotificationService';
 
 const BluetoothContext = createContext();
 
@@ -14,6 +15,7 @@ export const BluetoothProvider = ({ children }) => {
   useEffect(() => {
     loadHistory();
     loadSosNumber();
+    NotificationService.setup(); // Inicializar permisos y canales de notificación
   }, []);
 
   const loadHistory = async () => {
@@ -47,6 +49,11 @@ export const BluetoothProvider = ({ children }) => {
     setHistory(newHistory);
     await AsyncStorage.setItem('@impact_history', JSON.stringify(newHistory));
     
+    // Disparar notificación si las alertas están habilitadas
+    if (alertsEnabled) {
+      NotificationService.notifyImpact(data.zone, data.force);
+    }
+
     if (data.force > 10 && alertsEnabled) {
       setIsAlertActive(true);
     }
