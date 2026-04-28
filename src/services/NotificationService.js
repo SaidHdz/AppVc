@@ -11,7 +11,7 @@ Notifications.setNotificationHandler({
 });
 
 /**
- * Servicio para gestionar las notificaciones locales de Revyn Head Guard.
+ * Servicio para gestionar las notificaciones locales de Shield Sense.
  */
 export const NotificationService = {
   /**
@@ -55,12 +55,12 @@ export const NotificationService = {
    * @param {number} force - Fuerza en G
    */
   async notifyImpact(zone, force) {
-    const isCritical = force > 10;
+    const isCritical = force > 11;
     
     await Notifications.scheduleNotificationAsync({
       content: {
         title: isCritical ? "🚨 ¡ALERTA DE IMPACTO CRÍTICO!" : "⚠️ Impacto Detectado",
-        body: `Zona: ${zone} | Fuerza: ${force}G. Revise el estado del paciente.`,
+        body: `Zona: ${zone} | Fuerza: ${force}G. Revise el estado del usuario.`,
         data: { zone, force, type: 'impact' },
         color: isCritical ? '#D32F2F' : '#1976D2', // Color de la notificación en Android
         android: {

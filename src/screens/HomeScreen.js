@@ -26,8 +26,8 @@ export default function HomeScreen() {
 
   // Lógica de severidad clínica
   const getSeverity = (force) => {
-    if (force < 7) return { label: 'Leve', color: '#4CAF50', bg: '#E8F5E9' };
-    if (force <= 11) return { label: 'Moderado', color: '#FFA000', bg: '#FFF8E1' };
+    if (force < 7) return { label: 'Leve', color: '#FBC02D', bg: '#FFFDE7' };
+    if (force <= 11) return { label: 'Moderado', color: '#FF9800', bg: '#FFF3E0' };
     return { label: 'Severo', color: '#D32F2F', bg: '#FFEBEE' };
   };
 
@@ -38,8 +38,8 @@ export default function HomeScreen() {
       {/* Header Clínico */}
       <View style={styles.header}>
         <View>
-          <Text style={styles.brand}>REVYN HEAD GUARD</Text>
-          <Text style={styles.patientName}>Paciente: Said Alejandro</Text>
+          <Text style={styles.brand}>SHIELD SENSE</Text>
+          <Text style={styles.patientName}>Usuario: Said Alejandro</Text>
         </View>
         <TouchableOpacity 
           onPress={() => setAlertsEnabled(!alertsEnabled)}

@@ -1,12 +1,12 @@
 {
   "expo": {
-    "name": "AppVictor",
+    "name": "Shield Sense",
     "slug": "appvictor-v2",
-    "version": "1.0.0",
+    "version": "1.0.2",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-    "newArchEnabled": false,
+    "newArchEnabled": true,
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
@@ -34,6 +34,9 @@
       "eas": {
         "projectId": "67a82c35-5143-4f1e-be4b-e365b604eebb"
       }
-    }
+    },
+    "plugins": [
+      "expo-asset"
+    ]
   }
 }

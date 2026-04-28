@@ -10,11 +10,16 @@ export const BluetoothProvider = ({ children }) => {
   const [isAlertActive, setIsAlertActive] = useState(false);
   const [alertsEnabled, setAlertsEnabled] = useState(true);
   const [history, setHistory] = useState([]);
-  const [sosNumber, setSosNumber] = useState('911'); // Valor por defecto
+  const [userData, setUserData] = useState({
+    name: 'Said Alejandro',
+    age: '',
+    height: '',
+    weight: ''
+  });
 
   useEffect(() => {
     loadHistory();
-    loadSosNumber();
+    loadUserData();
     NotificationService.setup(); // Inicializar permisos y canales de notificación
   }, []);
 
@@ -25,20 +30,20 @@ export const BluetoothProvider = ({ children }) => {
     } catch (e) { console.error("Error cargando historial", e); }
   };
 
-  const loadSosNumber = async () => {
+  const loadUserData = async () => {
     try {
-      const savedNumber = await AsyncStorage.getItem('@sos_number');
-      if (savedNumber) setSosNumber(savedNumber);
-    } catch (e) { console.error("Error cargando número SOS", e); }
+      const savedData = await AsyncStorage.getItem('@user_data');
+      if (savedData) setUserData(JSON.parse(savedData));
+    } catch (e) { console.error("Error cargando datos de usuario", e); }
   };
 
-  const saveSosNumber = async (number) => {
+  const saveUserData = async (data) => {
     try {
-      setSosNumber(number);
-      await AsyncStorage.setItem('@sos_number', number);
+      setUserData(data);
+      await AsyncStorage.setItem('@user_data', JSON.stringify(data));
       return true;
     } catch (e) {
-      console.error("Error guardando número SOS", e);
+      console.error("Error guardando datos de usuario", e);
       return false;
     }
   };
@@ -54,7 +59,7 @@ export const BluetoothProvider = ({ children }) => {
       NotificationService.notifyImpact(data.zone, data.force);
     }
 
-    if (data.force > 10 && alertsEnabled) {
+    if (data.force > 11 && alertsEnabled) {
       setIsAlertActive(true);
     }
   };
@@ -86,9 +91,9 @@ export const BluetoothProvider = ({ children }) => {
 
   return (
     <BluetoothContext.Provider value={{ 
-      lastEvent, isConnected, isAlertActive, alertsEnabled, history, sosNumber,
+      lastEvent, isConnected, isAlertActive, alertsEnabled, history, userData,
       onDataReceived, simulateImpact, dismissAlert, clearHistory,
-      setIsConnected, setAlertsEnabled, saveSosNumber
+      setIsConnected, setAlertsEnabled, saveUserData
     }}>
       {children}
     </BluetoothContext.Provider>

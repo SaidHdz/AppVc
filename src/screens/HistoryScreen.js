@@ -10,8 +10,8 @@ export default function HistoryScreen({ navigation }) {
 
   // Lógica de severidad clínica (igual que en Dashboard)
   const getSeverity = (force) => {
-    if (force < 7) return { label: 'Leve', color: '#4CAF50', bg: '#E8F5E9' };
-    if (force <= 11) return { label: 'Moderado', color: '#FFA000', bg: '#FFF8E1' };
+    if (force < 7) return { label: 'Leve', color: '#FBC02D', bg: '#FFFDE7' };
+    if (force <= 11) return { label: 'Moderado', color: '#FF9800', bg: '#FFF3E0' };
     return { label: 'Severo', color: '#D32F2F', bg: '#FFEBEE' };
   };
 

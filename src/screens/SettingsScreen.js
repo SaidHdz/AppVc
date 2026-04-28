@@ -1,20 +1,24 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, KeyboardAvoidingView, Platform } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { useBluetooth } from '../context/BluetoothContext';
-import { Shield, Save } from 'lucide-react-native';
+import { User, Save } from 'lucide-react-native';
 
 export default function SettingsScreen() {
-  const { sosNumber, saveSosNumber } = useBluetooth();
-  const [number, setNumber] = useState(sosNumber);
+  const { userData, saveUserData } = useBluetooth();
+  const [formData, setFormData] = useState(userData);
+
+  useEffect(() => {
+    setFormData(userData);
+  }, [userData]);
 
   const handleSave = async () => {
-    if (number.length < 3) {
-      Alert.alert('Error', 'Ingresa un número válido');
+    if (!formData.name) {
+      Alert.alert('Error', 'El nombre es obligatorio');
       return;
     }
-    const success = await saveSosNumber(number);
+    const success = await saveUserData(formData);
     if (success) {
-      Alert.alert('Éxito', 'Número SOS guardado correctamente');
+      Alert.alert('Éxito', 'Perfil actualizado correctamente');
     }
   };
 
@@ -27,35 +31,59 @@ export default function SettingsScreen() {
         <Text style={styles.title}>Ajustes</Text>
       </View>
 
-      <View style={styles.content}>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Shield size={20} color="#1976D2" />
-            <Text style={styles.sectionTitle}>Configuración SOS</Text>
+            <User size={20} color="#1976D2" />
+            <Text style={styles.sectionTitle}>Perfil de Usuario</Text>
           </View>
           
-          <Text style={styles.label}>Número de Emergencia</Text>
+          <Text style={styles.label}>Nombre Completo</Text>
           <TextInput
             style={styles.input}
-            value={number}
-            onChangeText={setNumber}
-            keyboardType="phone-pad"
-            placeholder="Ej: 911"
+            value={formData.name}
+            onChangeText={(val) => setFormData({...formData, name: val})}
+            placeholder="Ej: Said Alejandro"
           />
-          <Text style={styles.helperText}>
-            Este número será llamado automáticamente cuando presiones el botón SOS en la alerta de impacto.
-          </Text>
+
+          <View style={styles.row}>
+            <View style={styles.col}>
+              <Text style={styles.label}>Edad</Text>
+              <TextInput
+                style={styles.input}
+                value={formData.age}
+                onChangeText={(val) => setFormData({...formData, age: val})}
+                keyboardType="numeric"
+                placeholder="25"
+              />
+            </View>
+            <View style={styles.col}>
+              <Text style={styles.label}>Estatura (cm)</Text>
+              <TextInput
+                style={styles.input}
+                value={formData.height}
+                onChangeText={(val) => setFormData({...formData, height: val})}
+                keyboardType="numeric"
+                placeholder="175"
+              />
+            </View>
+          </View>
+
+          <Text style={styles.label}>Peso (kg)</Text>
+          <TextInput
+            style={styles.input}
+            value={formData.weight}
+            onChangeText={(val) => setFormData({...formData, weight: val})}
+            keyboardType="numeric"
+            placeholder="70"
+          />
 
           <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
             <Save size={20} color="#fff" />
             <Text style={styles.saveButtonText}>Guardar Cambios</Text>
           </TouchableOpacity>
         </View>
-
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>Powered by Revyn Studio | Said & Caleb</Text>
-        </View>
-      </View>
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 }
@@ -64,15 +92,14 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F5F7FA' },
   header: { padding: 40, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#eee', alignItems: 'center' },
   title: { fontSize: 22, fontWeight: 'bold', color: '#333' },
-  content: { flex: 1, padding: 20, justifyContent: 'space-between' },
+  scrollContent: { padding: 20 },
   section: { backgroundColor: '#fff', padding: 20, borderRadius: 15, elevation: 2 },
   sectionHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 20 },
   sectionTitle: { fontSize: 18, fontWeight: 'bold', marginLeft: 10, color: '#333' },
   label: { fontSize: 14, color: '#666', marginBottom: 8 },
-  input: { backgroundColor: '#f8f9fa', padding: 15, borderRadius: 10, fontSize: 18, borderWidth: 1, borderColor: '#ddd', marginBottom: 10 },
-  helperText: { fontSize: 12, color: '#999', marginBottom: 20, lineHeight: 18 },
-  saveButton: { backgroundColor: '#1976D2', padding: 16, borderRadius: 12, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 10 },
+  input: { backgroundColor: '#f8f9fa', padding: 15, borderRadius: 10, fontSize: 16, borderWidth: 1, borderColor: '#ddd', marginBottom: 15 },
+  row: { flexDirection: 'row', gap: 15 },
+  col: { flex: 1 },
+  saveButton: { backgroundColor: '#1976D2', padding: 16, borderRadius: 12, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 10, marginTop: 10 },
   saveButtonText: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
-  footer: { paddingBottom: 20, alignItems: 'center' },
-  footerText: { fontSize: 12, color: '#999', fontWeight: '500' },
 });

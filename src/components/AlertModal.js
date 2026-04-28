@@ -4,11 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useBluetooth } from '../context/BluetoothContext';
 
 export default function AlertModal() {
-  const { isAlertActive, lastEvent, dismissAlert, sosNumber } = useBluetooth();
-
-  const handleCallSOS = () => {
-    Linking.openURL('tel:' + sosNumber).catch(err => console.error("No se pudo realizar la llamada", err));
-  };
+  const { isAlertActive, lastEvent, dismissAlert, userData } = useBluetooth();
 
   return (
     <Modal
@@ -24,27 +20,19 @@ export default function AlertModal() {
           {lastEvent && (
             <View style={styles.dataContainer}>
               <Text style={styles.gForceText}>{lastEvent.force} G</Text>
-              <Text style={styles.subText}>Fuerza detectada en zona: {lastEvent.zone.toUpperCase()}</Text>
             </View>
           )}
 
           <Text style={styles.instructionText}>
-            Se ha detectado un impacto contundente que supera el umbral de seguridad. ¿Te encuentras bien?
+            {userData.name} ha sufrido un golpe fuerte en {lastEvent?.zone?.replace('_', ' ').toUpperCase()}, se requiere monitoreo.
           </Text>
 
           <View style={styles.buttonContainer}>
             <TouchableOpacity 
-              style={[styles.button, styles.sosButton]} 
-              onPress={handleCallSOS}
-            >
-              <Text style={styles.sosButtonText}>LLAMAR SOS</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity 
               style={[styles.button, styles.dismissButton]} 
               onPress={dismissAlert}
             >
-              <Text style={styles.dismissButtonText}>ESTOY BIEN</Text>
+              <Text style={styles.dismissButtonText}>CONFIRMAR LECTURA</Text>
             </TouchableOpacity>
           </View>
         </View>

@@ -5,12 +5,14 @@ import { ChevronLeft, Zap, Clock, AlertTriangle, FileText, Activity } from 'luci
 import { LineChart } from 'react-native-chart-kit';
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
+import { useBluetooth } from '../context/BluetoothContext';
 
 export default function EventDetail({ route, navigation }) {
   const { event } = route.params;
+  const { userData } = useBluetooth();
   const screenWidth = Dimensions.get('window').width;
   
-  // Animación usando el módulo Animated estándar de React Native (Altamente compatible)
+  // Animación usando el módulo Animated estándar de React Native
   const fadeAnim = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
@@ -30,7 +32,16 @@ export default function EventDetail({ route, navigation }) {
     ).start();
   }, [fadeAnim]);
 
-  // Datos para la telemetría (se añade la línea de umbral de 8G)
+  // Lógica de severidad consistente
+  const getSeverity = (force) => {
+    if (force < 7) return { label: 'Leve', color: '#FBC02D', bg: '#FFFDE7' };
+    if (force <= 11) return { label: 'Moderado', color: '#FF9800', bg: '#FFF3E0' };
+    return { label: 'Severo', color: '#D32F2F', bg: '#FFEBEE' };
+  };
+
+  const severity = getSeverity(event.force);
+
+  // Datos para la telemetría (se añade la línea de umbral de 11G para Severo)
   const chartData = {
     labels: ["0", "20", "40", "60", "80", "100"],
     datasets: [
@@ -40,13 +51,13 @@ export default function EventDetail({ route, navigation }) {
         strokeWidth: 3
       },
       {
-        data: [8, 8, 8, 8, 8, 8],
+        data: [11, 11, 11, 11, 11, 11],
         color: (opacity = 1) => `rgba(211, 47, 47, ${opacity})`,
         strokeWidth: 2,
         withDots: false
       }
     ],
-    legend: ["Impacto (G)", "Umbral Seguro (8G)"]
+    legend: ["Impacto (G)", "Umbral Severo (11G)"]
   };
 
   const chartConfig = {
@@ -76,7 +87,7 @@ export default function EventDetail({ route, navigation }) {
             </style>
           </head>
           <body>
-            <h1>Reporte Clínico de Impacto - Revyn Head Guard</h1>
+            <h1>Reporte Clínico de Impacto - Shield Sense</h1>
             <div class="card">
               <div class="row">
                 <span class="label">ID de Evento:</span>
@@ -87,8 +98,16 @@ export default function EventDetail({ route, navigation }) {
                 <span class="value">${event.date} - ${event.timestamp}</span>
               </div>
               <div class="row">
-                <span class="label">Paciente:</span>
-                <span class="value">Said Alejandro</span>
+                <span class="label">Usuario:</span>
+                <span class="value">${userData.name}</span>
+              </div>
+              <div class="row">
+                <span class="label">Edad:</span>
+                <span class="value">${userData.age || 'N/A'} años</span>
+              </div>
+              <div class="row">
+                <span class="label">Estatura / Peso:</span>
+                <span class="value">${userData.height || 'N/A'} cm / ${userData.weight || 'N/A'} kg</span>
               </div>
             </div>
             
@@ -102,8 +121,12 @@ export default function EventDetail({ route, navigation }) {
                 <span class="label">Aceleración Máxima:</span>
                 <span class="value">${event.force} G</span>
               </div>
+              <div class="row">
+                <span class="label">Severidad:</span>
+                <span class="value" style="color: ${severity.color}">${severity.label}</span>
+              </div>
             </div>
-            <p style="margin-top: 50px; font-size: 12px; text-align: center; color: #999;">Generado automáticamente por Revyn Studio</p>
+            <p style="margin-top: 50px; font-size: 12px; text-align: center; color: #999;">Generado automáticamente por Shield Sense</p>
           </body>
         </html>
       `;
@@ -127,16 +150,10 @@ export default function EventDetail({ route, navigation }) {
       </View>
 
       <ScrollView style={styles.content}>
-        {/* Alerta Prioritaria Parpadeante usando Animated nativo */}
-        <Animated.View style={[styles.priorityAlert, { opacity: fadeAnim }]}>
-          <AlertTriangle color="#F57F17" size={24} />
-          <Text style={styles.priorityAlertText}>⚠️ ALERTA CRÍTICA: El usuario permaneció inmóvil 10s tras el impacto.</Text>
-        </Animated.View>
-
-        <View style={[styles.severityCard, { backgroundColor: event.force > 10 ? '#FFEBEE' : '#E8F5E9' }]}>
-          <Activity color={event.force > 10 ? '#D32F2F' : '#4CAF50'} size={24} />
-          <Text style={[styles.severityText, { color: event.force > 10 ? '#D32F2F' : '#4CAF50' }]}>
-            Severidad: {event.force > 10 ? 'Alta' : 'Moderada'}
+        <View style={[styles.severityCard, { backgroundColor: severity.bg }]}>
+          <Activity color={severity.color} size={24} />
+          <Text style={[styles.severityText, { color: severity.color }]}>
+            Severidad: {severity.label}
           </Text>
         </View>
 
@@ -177,7 +194,7 @@ export default function EventDetail({ route, navigation }) {
             </View>
           </View>
           <View style={styles.timelineItem}>
-            <View style={[styles.timelineDot, { backgroundColor: '#D32F2F' }]} />
+            <View style={[styles.timelineDot, { backgroundColor: severity.color }]} />
             <View style={styles.timelineLine} />
             <View>
               <Text style={styles.timelineText}>Impacto Detectado ({event.zone.replace('_', ' ').toUpperCase()})</Text>
@@ -202,8 +219,6 @@ const styles = StyleSheet.create({
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#eee' },
   headerTitle: { fontSize: 18, fontWeight: 'bold', color: '#333' },
   content: { padding: 20 },
-  priorityAlert: { flexDirection: 'row', backgroundColor: '#FFF9C4', padding: 15, borderRadius: 12, marginBottom: 20, alignItems: 'center', gap: 10, borderWidth: 1, borderColor: '#FBC02D' },
-  priorityAlertText: { flex: 1, fontSize: 13, color: '#F57F17', fontWeight: 'bold' },
   severityCard: { flexDirection: 'row', alignItems: 'center', padding: 15, borderRadius: 12, marginBottom: 20, gap: 10 },
   severityText: { fontSize: 16, fontWeight: 'bold' },
   metricsRow: { flexDirection: 'row', gap: 15, marginBottom: 25 },
