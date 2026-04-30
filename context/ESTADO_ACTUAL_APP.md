@@ -1,42 +1,26 @@
-# **Estado Actual del Proyecto: Revyn Head Guard**
-**Fecha:** 24 de Abril, 2026 (Sesión Finalizada)
+# **Estado Actual del Proyecto: Shield Sense**
+**Fecha:** 29 de Abril, 2026 (Sesión de Integración y Adaptación Final)
 **Lead Developer:** Said Alejandro & AI Agent
 
 ## **1. Resumen de la Aplicación**
-Revyn Head Guard es una plataforma de monitoreo clínico para traumatismos craneales en tiempo real. Utiliza un visor 3D interactivo para localizar impactos recibidos desde un sensor externo, clasifica la severidad del golpe y activa protocolos de emergencia automáticos.
+Shield Sense ha evolucionado de un prototipo simulado a una plataforma de monitoreo real. La app es capaz de identificar el hardware de Caleb, establecer un vínculo BLE estable y procesar telemetría de impacto de 24/26 bytes.
 
-## **2. Stack Tecnológico Final (Estable)**
-*   **Framework:** Expo SDK 54 (Blank Template).
-*   **Lenguaje:** JavaScript / React Native.
-*   **Motor 3D:** Three.js (`@react-three/fiber` / `@react-three/drei`).
-*   **UI:** NativeWind v2.0.11 (Tailwind CSS) con Tailwind v3.3.2 para estabilidad síncrona.
-*   **Navegación:** React Navigation (Tabs + Stack).
-*   **Notificaciones:** `expo-notifications` y `expo-device` (Notificaciones locales y gestión de canales).
-*   **Despliegue/Build:** EAS (Expo Application Services) configurado (`eas.json`).
-*   **Gráficas:** `react-native-chart-kit`.
-*   **Servicios:** `expo-print` y `expo-sharing` (Generación de PDF).
-*   **Estabilidad:** Se eliminó `react-native-reanimated` de componentes críticos para evitar conflictos de TurboModules en Windows, sustituyéndolo por el módulo `Animated` nativo.
+## **2. Stack Tecnológico Final**
+*   **Core:** React Native + Expo SDK 54 (Development Build).
+*   **BLE:** `react-native-ble-plx` con motor de **Polling Adaptativo** (4Hz).
+*   **Visualización:** Three.js con rotación automática ante impactos y semáforo de severidad (3.5g - 11g).
+*   **Persistencia:** Perfil de usuario antropométrico guardado localmente.
 
-## **3. Estructura de Archivos**
-*   `App.js`: Router principal y Global Providers.
-*   `src/services/NotificationService.js`: Gestión de permisos, canales de Android y disparo de notificaciones.
-*   `src/components/HeadModelViewer.js`: Visor 3D con rotación de 14 zonas e iluminación zonal suave.
-*   `src/components/AlertModal.js`: Sistema de emergencia con temporizador 30s y Auto-SOS.
-*   `src/context/BluetoothContext.js`: Cerebro de la app (Historial, SOS, Sensores, Integración de Notificaciones).
-*   `src/screens/HomeScreen.js`: Dashboard clínico con tarjeta de estado y batería.
-*   `src/screens/HistoryScreen.js`: Analíticas de impacto y filtros de severidad.
-*   `src/screens/EventDetail.js`: Telemetría, curva de aceleración y exportación PDF.
-*   `src/screens/SettingsScreen.js`: Configuración de contacto SOS y paciente.
+## **3. Integración con Hardware (Estado Crítico)**
+*   **Protocolo:** Adaptado al Servicio `FEED` (`0000feed...`) detectado físicamente.
+*   **Estrategia:** La app utiliza **Polling** manual para leer la característica `0019` debido a la ausencia del descriptor `2902` en el firmware actual.
+*   **Resultado:** La app conecta y mapea correctamente. La recepción de datos depende ahora exclusivamente de que el firmware actualice el valor de la característica en el chip.
 
-## **4. Funcionalidades Clave Implementadas**
-1.  **Monitoreo 360°:** El modelo 3D rota a 14 puntos específicos y parpadea en rojo solo en la zona afectada.
-2.  **Notificaciones de Impacto (Nuevo):** Sistema de alertas locales que funcionan con la app en primer o segundo plano. Colores temáticos: Azul Médico para informativas y Rojo Alerta para impactos críticos (>10G).
-3.  **Protocolo SOS:** Si el impacto supera los 10G, inicia cuenta regresiva. Si el usuario no responde, llama al número guardado.
-4.  **Analíticas Clínicas:** El historial muestra picos máximos, zonas frecuentes y permite filtrar por nivel de riesgo.
-5.  **Telemetría con Umbral:** Gráfica de fuerza G con línea roja de seguridad en los 8G.
-6.  **Exportación Médica:** Capacidad de compartir un reporte PDF profesional del evento.
+## **4. Cambios de Marca y UI**
+*   **Rebranding:** Eliminadas todas las menciones a Revyn. Identidad unificada como "Shield Sense".
+*   **Perfil:** Implementados campos de Nombre, Edad, Estatura y Peso en Ajustes.
+*   **Reportes:** Los informes PDF ahora incluyen el perfil completo del usuario y telemetría avanzada.
 
-## **5. Notas para la Próxima Sesión**
-*   **Integración:** Pendiente conectar la inyección de datos reales desde el módulo Bluetooth de Caleb (el sistema de notificaciones ya está listo para reaccionar a estos datos).
-*   **EAS Build:** La configuración de EAS está lista para generar compilaciones nativas si es necesario.
-*   **Mantenimiento:** Sincronizado en `SaidHdz/AppVc` (rama master).
+## **5. Pendientes para Caleb**
+1.  Incluir `BLE2902` para habilitar notificaciones nativas (eliminar necesidad de polling).
+2.  Asegurar que `notify()` se ejecute en cada impacto.

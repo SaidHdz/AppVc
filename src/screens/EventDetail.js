@@ -32,10 +32,11 @@ export default function EventDetail({ route, navigation }) {
     ).start();
   }, [fadeAnim]);
 
-  // Lógica de severidad consistente
+  // Lógica de severidad consistente (Shield Sense Standard)
   const getSeverity = (force) => {
-    if (force < 7) return { label: 'Leve', color: '#FBC02D', bg: '#FFFDE7' };
-    if (force <= 11) return { label: 'Moderado', color: '#FF9800', bg: '#FFF3E0' };
+    if (force < 3.5) return { label: 'Normal', color: '#4CAF50', bg: '#E8F5E9' };
+    if (force < 7.0) return { label: 'Leve', color: '#FBC02D', bg: '#FFFDE7' };
+    if (force <= 11.0) return { label: 'Moderado', color: '#FF9800', bg: '#FFF3E0' };
     return { label: 'Severo', color: '#D32F2F', bg: '#FFEBEE' };
   };
 

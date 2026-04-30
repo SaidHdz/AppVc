@@ -1,5 +1,13 @@
 import React from 'react';
+import { LogBox } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
+
+// Silenciar warnings específicos
+LogBox.ignoreLogs([
+  'THREE',
+  'expo-notifications',
+  'Non-serializable values were found in the navigation state',
+]);
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as SplashScreen from 'expo-splash-screen';

@@ -19,15 +19,17 @@ export default function HomeScreen() {
     lastEvent, 
     isConnected, 
     simulateImpact, 
-    setIsConnected, 
+    startScan, 
     alertsEnabled, 
-    setAlertsEnabled 
+    setAlertsEnabled,
+    userData
   } = useBluetooth();
 
-  // Lógica de severidad clínica
+  // Lógica de severidad clínica (Shield Sense Standard)
   const getSeverity = (force) => {
-    if (force < 7) return { label: 'Leve', color: '#FBC02D', bg: '#FFFDE7' };
-    if (force <= 11) return { label: 'Moderado', color: '#FF9800', bg: '#FFF3E0' };
+    if (force < 3.5) return { label: 'Normal', color: '#4CAF50', bg: '#E8F5E9' };
+    if (force < 7.0) return { label: 'Leve', color: '#FBC02D', bg: '#FFFDE7' };
+    if (force <= 11.0) return { label: 'Moderado', color: '#FF9800', bg: '#FFF3E0' };
     return { label: 'Severo', color: '#D32F2F', bg: '#FFEBEE' };
   };
 
@@ -39,7 +41,7 @@ export default function HomeScreen() {
       <View style={styles.header}>
         <View>
           <Text style={styles.brand}>SHIELD SENSE</Text>
-          <Text style={styles.patientName}>Usuario: Said Alejandro</Text>
+          <Text style={styles.patientName}>Usuario: {userData.name || 'Sin nombre'}</Text>
         </View>
         <TouchableOpacity 
           onPress={() => setAlertsEnabled(!alertsEnabled)}
@@ -73,6 +75,7 @@ export default function HomeScreen() {
         <View style={styles.viewerContainer}>
           <HeadModelViewer 
             impactZone={lastEvent?.zone} 
+            force={lastEvent?.force}
             lastEventId={lastEvent?.id}
           />
         </View>
@@ -115,13 +118,27 @@ export default function HomeScreen() {
             </TouchableOpacity>
             <TouchableOpacity 
               style={[styles.connBtn, { borderColor: isConnected ? '#4CAF50' : '#D32F2F' }]} 
-              onPress={() => setIsConnected(!isConnected)}
+              onPress={() => !isConnected && startScan()}
+              disabled={isConnected}
             >
               <Text style={[styles.btnText, { color: isConnected ? '#4CAF50' : '#D32F2F' }]}>
                 {isConnected ? 'Activo' : 'Reconectar'}
               </Text>
             </TouchableOpacity>
           </View>
+
+          {isConnected && (
+            <TouchableOpacity 
+              style={styles.syncBtn} 
+              onPress={async () => {
+                const success = await useBluetooth().syncTime();
+                if(success) Alert.alert("Éxito", "Reloj del casco sincronizado");
+              }}
+            >
+              <Clock size={16} color="#1976D2" />
+              <Text style={styles.syncBtnText}>Sincronizar Reloj</Text>
+            </TouchableOpacity>
+          )}
         </View>
       </ScrollView>
 
@@ -174,5 +191,16 @@ const styles = StyleSheet.create({
   actionRow: { flexDirection: 'row', gap: 12, marginTop: 20 },
   simBtn: { flex: 2, backgroundColor: '#1976D2', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: 15, borderRadius: 15, gap: 8 },
   connBtn: { flex: 1, borderWidth: 2, justifyContent: 'center', alignItems: 'center', borderRadius: 15 },
-  btnText: { fontWeight: 'bold', fontSize: 14, color: '#fff' }
+  btnText: { fontWeight: 'bold', fontSize: 14, color: '#fff' },
+  syncBtn: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    justifyContent: 'center', 
+    gap: 8, 
+    marginTop: 15, 
+    padding: 10,
+    backgroundColor: '#E3F2FD',
+    borderRadius: 12
+  },
+  syncBtnText: { color: '#1976D2', fontWeight: 'bold', fontSize: 13 }
 });
