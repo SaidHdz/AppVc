@@ -6,14 +6,19 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-    "newArchEnabled": true,
+    "newArchEnabled": false,
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.saidtsh.appvictorv2",
+      "infoPlist": {
+        "NSBluetoothAlwaysUsageDescription": "Shield Sense necesita Bluetooth para conectarse al sensor de impacto.",
+        "NSBluetoothPeripheralUsageDescription": "Shield Sense necesita Bluetooth para conectarse al sensor de impacto."
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -21,7 +26,14 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.saidtsh.appvictorv2"
+      "package": "com.saidtsh.appvictorv2",
+      "permissions": [
+        "android.permission.BLUETOOTH",
+        "android.permission.BLUETOOTH_ADMIN",
+        "android.permission.BLUETOOTH_SCAN",
+        "android.permission.BLUETOOTH_CONNECT",
+        "android.permission.ACCESS_FINE_LOCATION"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -36,7 +48,15 @@
       }
     },
     "plugins": [
-      "expo-asset"
+      "expo-asset",
+      [
+        "react-native-ble-plx",
+        {
+          "isBackgroundEnabled": false,
+          "modes": ["central"],
+          "bluetoothAlwaysPermission": "Shield Sense necesita Bluetooth para conectarse al sensor de impacto."
+        }
+      ]
     ]
   }
 }
